@@ -1,5 +1,7 @@
 import Classes as cl
-import pandas as pd
+import sys
+print (sys.version)
+# import pandas as pd
 
 
 # try:
@@ -19,8 +21,11 @@ import pandas as pd
 #     except:
 #         print('invalid customer ID. It should be an integer. Enter again or type "exit" to abort')
 
-customers = pd.DataFrame({'col1':[], 'col2':[]})
-customers.to_csv('customers.csv', mode='a', header=True)
+# https://docs.anaconda.com/anaconda/user-guide/tasks/integration/python-vsc/
+# https://ddf46429.springboard.com/uploads/resources/1599511103_Python_OOP_Mini_Project_1_.pdf
+
+# customers = pd.DataFrame({'col1':[], 'col2':[]})
+# customers.to_csv('customers.csv', mode='a', header=True)
 # with open('my_csv.csv', 'a') as f:
 #     df.to_csv(f, header=False)
 
