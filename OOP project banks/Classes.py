@@ -1,6 +1,9 @@
 class BankAccount:
     def __init__(self, balance = 0):
         self.balance = balance
+
+    def open_new_account(self, balance)
+        self.balance = balance
     
     def withdraw(self, amount):
         self.balance -= amount
@@ -12,7 +15,7 @@ class BankAccount:
 
 
 class SavingsAccount(BankAccount):
-    def __init__(self, balance, interest_rate):
+    def __init__(self, balance, interest_rate = 0.0032):
         BankAccount.__init__(self, balance)
         self.interest_rate = interest_rate
 
@@ -21,13 +24,14 @@ class SavingsAccount(BankAccount):
 
 
 class Customer():
-    def __init__(self, first_name, last_name):
+    def __init__(self, first_name, last_name, ssn):
         self.first_name = first_name
         self.last_name = last_name
+        self.ssn = ssn
 
 
 class FixeMortgage30():
-    def __init__(self, credit_score, interest_rate=0.05):
+    def __init__(self, credit_score, interest_rate=0.043):
         self.interest_rate = interest_rate
         self.credit_score = credit_score
         if (self.credit_score > 600) & (self.credit_score < 690):
@@ -51,6 +55,11 @@ class CreditCard():
             self.outcome = 'Denied' 
         return self.outcome
 
+
+# c = Customer('John', 'Smith', '432859239')
+# print(c.ssn)
+# c.ssn = 5
+# print(c.ssn)
 
 # s = SavingsAccount(1000, 0.05)
 # s.withdraw(500)
