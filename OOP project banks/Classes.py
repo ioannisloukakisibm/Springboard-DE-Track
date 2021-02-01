@@ -2,7 +2,7 @@ class BankAccount:
     def __init__(self, balance = 0):
         self.balance = balance
 
-    def open_new_account(self, balance)
+    def open_new_account(self, balance):
         self.balance = balance
     
     def withdraw(self, amount):
@@ -19,8 +19,21 @@ class SavingsAccount(BankAccount):
         BankAccount.__init__(self, balance)
         self.interest_rate = interest_rate
 
-    def compute_interest(self, n_periods = 1):
-        return self.balance * ( (1+self.interest_rate)**n_periods-1)
+    def compute_monthly_interest(self, n_periods = 1):
+        return self.balance * ( (1+self.interest_rate)**(n_periods/12)-1)
+
+
+class CheckingAccount(BankAccount):
+    def __init__(self, balance):
+        BankAccount.__init__(self, balance)
+
+    def apply_for_checkbook(self):
+        if self.balance < 100:
+            return "your balance is less than $100. Add more funds to qualify for a checkbook" 
+        else:
+            return "Your checkbook will be on its way soon!" 
+
+
 
 
 class Customer():
