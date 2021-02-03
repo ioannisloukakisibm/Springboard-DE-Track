@@ -7,21 +7,36 @@ import random
 # import sklearn
 # from sklearn import datasets
 
-
-# Check if we have customers already or if the current is the only customer
-# If there is no csv, there are no customers so we create a file in the except part
+"""
+customer.csv is our customer database.
+in the following try - except bblock We first Check if we have customers already or if the current is the only customer.
+If there is no csv, we assume there are no customers so we create a file with all the columns and a fake row
+"""
 try:
     customer_ids = pd.read_csv("customers.csv", usecols=['id'], squeeze=True)
     customer_ssns = pd.read_csv("customers.csv", usecols=['ssn'], squeeze=True)
 except:
-    customer_set = pd.DataFrame({'id':[55],'ssn':[999999999],'first_name':['h'],'last_name':['h']})
+    customer_set = pd.DataFrame({'id':[-1],'ssn':[999999999],'first_name':['test (not a real customer'],'last_name':['test (not a real customer']})
     customer_set.to_csv('customers.csv', mode='a', header=True)
     customer_ids = pd.read_csv("customers.csv", usecols=['id'], squeeze=True)
     customer_ssns = pd.read_csv("customers.csv", usecols=['ssn'], squeeze=True)
 
 
+
+"""
+The rest of the code is designed for the user interaction with the system. 
+It is a series of try-except statements, while loops and conditionals designed to prevent the user from entering wrong information.
+In each step, the user can type 'exit; to abort and get out of the program.
+At the end of each code block, we use the classes created in the Classes.py program to populate our database (csv) 
+with the new information entered by the user.
+"""
+
+
+
+# prompt the user to select an action
 print(" Good morning! What's next? \n Enter the appropriate number of the following options: \n 1 checking account \n 2 savings account \n 3 apply for credit card\n 4 apply for mortgage\n 5 add a new customer")
 
+# Make sure the data entered by the user follows the guidelines
 while True:
     action = input()
 
@@ -39,11 +54,12 @@ while True:
         print("please enter the appropriate integer number from the list above. type 'exit' to abort")
 
 
-
+# The following if statements respond to the user's selection'
 if action == 1:
     print("Checking account")
     print("Enter the appropriate number of the following options: \n 1 deposit \n 2 withdraw \n 3 Open a new account \n 4 order a checkbook")
 
+# Make sure the data entered by the user follows the guidelines
     while True:
         action2 = input()
 
@@ -63,6 +79,7 @@ if action == 1:
     if action2 == 1:
         print("Enter the current balance in the account ")
 
+# Make sure the data entered by the user follows the guidelines
         while True:
             current_balance = input()
 
@@ -81,7 +98,8 @@ if action == 1:
 
 
         print("Enter the amount you want to deposit ")
-        
+
+# Make sure the data entered by the user follows the guidelines
         while True:
             deposit_amount = input()
 
@@ -108,6 +126,7 @@ if action == 1:
 
         print("Enter the current balance in the account ")
 
+# Make sure the data entered by the user follows the guidelines
         while True:
             current_balance = input()
 
@@ -126,7 +145,7 @@ if action == 1:
 
         print("Enter the amount you want to withdraw ")
 
-
+# Make sure the data entered by the user follows the guidelines
         while True:
             withdrawal_amount = input()
 
@@ -158,6 +177,7 @@ if action == 1:
 
         print("Enter the balance of the new account ")
 
+# Make sure the data entered by the user follows the guidelines
         while True:
             current_balance = input()
 
@@ -184,6 +204,7 @@ if action == 1:
 
         print("Enter the balance of the account ")
 
+# Make sure the data entered by the user follows the guidelines
         while True:
             current_balance = input()
 
@@ -211,6 +232,7 @@ elif action == 2:
     print("Savings account")
     print("Enter the appropriate number of the following options: \n 1 deposit \n 2 withdraw \n 3 Open a new account ")
 
+# Make sure the data entered by the user follows the guidelines
     while True:
         action2 = input()
 
@@ -230,6 +252,7 @@ elif action == 2:
     if action2 == 1:
         print("Enter the current balance in the account ")
 
+# Make sure the data entered by the user follows the guidelines
         while True:
             current_balance = input()
 
@@ -248,7 +271,8 @@ elif action == 2:
 
 
         print("Enter the amount you want to deposit ")
-        
+
+# Make sure the data entered by the user follows the guidelines
         while True:
             deposit_amount = input()
 
@@ -277,6 +301,7 @@ elif action == 2:
 
         print("Enter the current balance in the account ")
 
+# Make sure the data entered by the user follows the guidelines
         while True:
             current_balance = input()
 
@@ -295,7 +320,7 @@ elif action == 2:
 
         print("Enter the amount you want to withdraw ")
 
-
+# Make sure the data entered by the user follows the guidelines
         while True:
             withdrawal_amount = input()
 
@@ -329,6 +354,7 @@ elif action == 2:
 
         print("Enter the balance of the new account ")
 
+# Make sure the data entered by the user follows the guidelines
         while True:
             current_balance = input()
 
@@ -355,6 +381,7 @@ elif action == 2:
 elif action == 3:
     print("Enter the customer's credit score or type 'exit' to abort ")
 
+# Make sure the data entered by the user follows the guidelines
     while True:
         credit_score = input()
 
@@ -384,6 +411,8 @@ elif action == 3:
 elif action == 4:
     print("Enter the customer's credit score or type 'exit' to abort ")
 
+
+# Make sure the data entered by the user follows the guidelines
     while True:
         credit_score = input()
 
@@ -414,6 +443,7 @@ elif action == 4:
 elif action == 5:
     print("Enter the customer's social security number with no dashes or type 'exit' to abort ")
 
+# Make sure the data entered by the user follows the guidelines
     while True:
         ssn = input()
 
@@ -436,6 +466,7 @@ elif action == 5:
             
             
 
+# Make sure the data entered by the user follows the guidelines
     while True:
         first_name = input("Enter the customer's first name or type 'exit' to abort ")
 
@@ -461,6 +492,7 @@ elif action == 5:
             break
 
 
+# Make sure the randomly generated ID does not exist already in our database
     while True:
         id = random.randint(1,10000000000)
         if id in list(customer_ids):
@@ -468,44 +500,7 @@ elif action == 5:
         else:
             break
 
-
     customer_holder = cl.Customer(first_name,last_name,ssn)
     new_customer = pd.DataFrame({'id':[id],'ssn':[ssn],'first_name':[first_name],'last_name':[last_name]})
     new_customer.to_csv('customers.csv', mode='a', header=False)
     print("customer registered successfully!")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # https://ddf46429.springboard.com/uploads/resources/1599511103_Python_OOP_Mini_Project_1_.pdf
-
-# # Check if the customer already exists or if we need to create a new entry
-# if int(id) in list(customer_ids):
-#     #     customers_holder = pd.DataFrame({'name':['John'],'id':[id]})
-#     #     customers_holder.to_csv('customers.csv', mode='a', header=False)
-
-# # with open('my_csv.csv', 'a') as f:
-# #     df.to_csv(f, header=False)
-# # https://stackoverflow.com/questions/17530542/how-to-add-pandas-data-to-an-existing-csv-file
-
-# # c = Classes.CreditCard(660).application()
-# # print(c)
-# # print(addit(1,2))
-# # print(CreditCard(660).application())
-# # print(CreditCard(640).application())
-# # print('\n')
-# # print(FixeMortgage30(590).application())
-# # print(FixeMortgage30(680).application())
-# # print(FixeMortgage30(750).application())
-# # print(FixeMortgage30(680).interest_rate)
-# # print(FixeMortgage30(750).interest_rate)
