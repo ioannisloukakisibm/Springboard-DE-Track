@@ -8,20 +8,20 @@ This repository contains all the source code for the backend implementation of a
 
 - Classes.py
 
-This is the code housing all the classes that we use to implement the user actions. These actions are the ones described in the overview above (apply for mortgages/credit cards, open bank accounts etc). These classes are imported and used in the drive.py program--the main program in this repository 
+This is the code housing all the classes that we use to implement the user actions. These actions are the ones described in the overview above (apply for mortgages/credit cards, open bank accounts etc). These classes are imported and used in the drive.py program--the main program in this repository. 
 
 - drive.py
 
 This code is designed for the user interaction with the system. It is a series of try-except statements, while loops and conditionals designed to prevent the user from entering wrong information. In each step, the user can type 'exit' to abort and get out of the program. At the end of each code block, we use the classes created in the Classes.py program to populate our database (csv) 
-with the new information entered by the user.
+with the new information entered by the user, when applicable.
 
 ### How to run the interphase
 
-Point your terminal of choice to the location this repository is stored in your system. This is a python designed interphase, so make sure you have [python](https://www.python.org/downloads/) installed. Use the command line to type 
+Point your terminal of choice to the location this repository is stored in your system. This is a python designed interphase, so make sure you have [python](https://www.python.org/downloads/) installed. Use the command line to type the following:
 
 python drive.py
 
-You should be prompted to take actions. Follow the self-explanatory directions
+hit 'enter' and You should be prompted to take actions. Follow the self-explanatory directions. type 'exit' at anny time to abort and start over.
 
 ### Where is the data stored
 customer.csv is our customer database. The program will automatically create this csv locally with all the relevant columns the first time the program runs. If there is no csv present, the assumption is that there are no customers so a file with all the columns and a fake row is created. All new customers are appended to that file automatically based on user input. 
