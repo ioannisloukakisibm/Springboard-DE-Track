@@ -21,7 +21,7 @@ Point your terminal of choice to the location this repository is stored in your 
 
 python drive.py
 
-hit 'enter' and You should be prompted to take actions. Follow the self-explanatory directions. type 'exit' at anny time to abort and start over.
+hit 'enter' and You should be prompted to take actions. Follow the self-explanatory directions. type 'exit' at any time to abort and start over.
 
 ### Where is the data stored
 customer.csv is our customer database. The program will automatically create this csv locally with all the relevant columns the first time the program runs. If there is no csv present, the assumption is that there are no customers so a file with all the columns and a fake row is created. All new customers are appended to that file automatically based on user input. 
