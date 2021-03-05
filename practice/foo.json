@@ -1,0 +1,1 @@
+{"properties": {"age": {"maximum": 130, "minimum": 1, "type": "integer"}, "has_children": {"type": "boolean"}, "id": {"type": "integer"}, "name": {"type": "string"}}, "$id": "http://yourdomain.com/schemas/my_user_schema.json", "$schema": "http://json-schema.org/draft-07/schema#"}
