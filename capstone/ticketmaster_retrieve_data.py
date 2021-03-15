@@ -303,9 +303,11 @@ cursor.close()
 
 current_dataset = pd.DataFrame(records, columns = list(cursor.column_names))
 
+print ('We pulled', current_dataset.shape[0], 'rows from the mysql database')
+
 try:
     appended_dataset = pd.concat([current_dataset, new_dataset], axis = 0)
-    # appended_dataset.drop(columns = [appended_dataset.columns[0]], inplace = True)
+    print ('The appended dataset of new and current rows contains', appended_dataset.shape[0], 'rows')
 
     appended_dataset['timestamp of data pull'] = pd.to_datetime(appended_dataset['timestamp of data pull'])
     appended_dataset['date of data pull'] = pd.to_datetime(appended_dataset['date of data pull'])
@@ -313,17 +315,29 @@ try:
     updated_dataset = appended_dataset.groupby(list_of_groupby_columns, as_index = False) \
     .agg({'date of data pull':'min', 'timestamp of data pull':'min'}) 
 
-    engine = create_engine(f'mysql+mysqlconnector://root:{password}@localhost:3306/ticketmaster')
-    connection = engine.connect()
+    print ('after the group by operation we ended up with', updated_dataset.shape[0], 'rows')
 
-    updated_dataset.to_sql(name = 'ticketmaster_triangle', con = engine, if_exists = 'replace', chunksize = 1000, index=False)
+    if updated_dataset.shape[0] > current_dataset.shape[0]:
 
-    extra_events = updated_dataset['event id'].nunique() - current_dataset['event id'].nunique()  
-    extra_rows = updated_dataset.shape[0] - current_dataset.shape[0]  
-    print ('This pull resulted in', extra_rows, 'new rows')
-    print ('This pull resulted in', extra_events, 'new events')
-    print ('The original dataset in mysql had', current_dataset.shape[0], 'rows')
-    print ('The updated dataset in mysql now has', updated_dataset.shape[0], 'rows')
+        engine = create_engine(f'mysql+mysqlconnector://root:{password}@localhost:3306/ticketmaster')
+        connection = engine.connect()
+
+        updated_dataset.to_sql(name = 'ticketmaster_triangle', con = engine, if_exists = 'replace', chunksize = 1000, index=False)
+
+        extra_events = updated_dataset['event id'].nunique() - current_dataset['event id'].nunique()  
+        extra_rows = updated_dataset.shape[0] - current_dataset.shape[0]  
+        print ('This pull resulted in', extra_rows, 'new rows')
+        print ('This pull resulted in', extra_events, 'new events')
+        print ('The original dataset in mysql had', current_dataset.shape[0], 'rows')
+        print ('The updated dataset in mysql now has', updated_dataset.shape[0], 'rows')
+
+    else:
+        extra_events = updated_dataset['event id'].nunique() - current_dataset['event id'].nunique()  
+        extra_rows = updated_dataset.shape[0] - current_dataset.shape[0]  
+        print ('This pull resulted in', extra_rows, 'new rows')
+        print ('This pull resulted in', extra_events, 'new events')
+        print ('Hence, we did not update the existing dataset in the MySQL database')
+
 
 
 except:
