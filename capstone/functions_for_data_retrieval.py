@@ -385,6 +385,7 @@ def clean_and_dedup_the_appended_set(appended_dataset):
 
 
 def upload_the_dataset_if_extra_rows(updated_dataset, database_dataset):
+    password = config('mysql_password')
 
     new_rows = updated_dataset.shape[0]
 
@@ -394,8 +395,8 @@ def upload_the_dataset_if_extra_rows(updated_dataset, database_dataset):
 
         updated_dataset.to_sql(name = 'triangle', con = engine, if_exists = 'replace', chunksize = 1000, index=False)
 
-        extra_events = updated_dataset['event id'].nunique() - current_dataset['event id'].nunique()  
-        extra_rows = updated_dataset.shape[0] - current_dataset.shape[0]  
+        extra_events = updated_dataset['event id'].nunique() - database_dataset['event id'].nunique()  
+        extra_rows = updated_dataset.shape[0] - database_dataset.shape[0]  
         logging.debug(f'This pull resulted in {extra_rows} new rows')
         logging.debug(f'This pull resulted in {extra_events} new events')
         logging.debug(f'Updating mysql was successful:')
