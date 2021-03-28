@@ -15,7 +15,7 @@ import mysql
 import mysql.connector
 from sqlalchemy import *
 
-from functions_for_data_retrieval import *
+from functions_for_ticketmaster_data_retrieval import *
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
