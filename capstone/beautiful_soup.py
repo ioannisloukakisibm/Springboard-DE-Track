@@ -33,6 +33,10 @@ src = r.content
 # soup = BeautifulSoup(html_doc)
 soup = BeautifulSoup(src)
 
+# mydoc = docx.Document()
+# mydoc.add_paragraph(find_all('p'))
+# mydoc.save(r'C:\Users\IoannisLoukakis\desktop\check_html_p.docx')
+
 
 for h2_tag in soup.find_all('a'):
         t = h2_tag.attrs['href']
@@ -41,8 +45,8 @@ for h2_tag in soup.find_all('a'):
 
 # WE NEED TO LOOP TO PRINT THE ATTRIBUTES
 # EXPORT THEM FOR REVIEW
-for h2_tag in soup.find_all('a'):
-        print(h2_tag.attrs)
+# for h2_tag in soup.find_all('a'):
+        # print(h2_tag.attrs)
         # print(t)
 
 # tag.string will give us the content in between the tag!
@@ -107,9 +111,10 @@ for h2_tag in soup.find_all('a'):
 
 
 
-"""
-TODO
-Load more events
-https://www.dpacnc.com/events/special-offers
-Get the event description as a text
-"""
+# """
+# TODO
+# Load more events
+# https://www.dpacnc.com/events/special-offers
+# Get the event description as a text
+# """
+

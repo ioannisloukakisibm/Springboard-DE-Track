@@ -8,6 +8,11 @@ import json
 import openpyxl
 import logging
 
+import warnings
+warnings.filterwarnings('ignore')
+
+from sqlalchemy import *
+
 from sklearn.preprocessing import MultiLabelBinarizer
 
 from datetime import datetime
@@ -25,6 +30,8 @@ client_secret = config('spotify_client_secret')
 current_year = pd.to_datetime("today").year
 
 year_list = list(np.arange(current_year-20,current_year+1))
+
+# year_list = [2020]
 
 track_ids = []
 
@@ -46,7 +53,18 @@ for i in range(len(track_ids)):
     except:
         continue
 
-        
+
+# # loop over track ids 
+# tracks = []
+# for track_id in track_ids[0:5]:
+#     try:
+#         track = getTrackFeatures(track_id)
+#         tracks.append(track)
+#     except:
+#         continue
+
+# print(tracks)     
+
 # create dataset
 df = pd.DataFrame(tracks, columns = [
     'song_id', 'song name', 'album', 'artist', 'artist genres', 'artist popularity', 'artist number of followers'
@@ -63,6 +81,10 @@ today_date = today_timestamp.date()
 df['date of data pull'] = today_date
 df['date of data pull'] = pd.to_datetime(df['date of data pull'])
 
+logging.debug(f'Extracted the song information of {df.shape[0]} songs')
+logging.debug(f'The data set has {df.shape[0]} rows and {df.shape[1]} columns')
+logging.debug('We still need to unpack the artist genres into columns')
+
 
 mlb = MultiLabelBinarizer()
 
@@ -70,4 +92,13 @@ artist_genres_dummies = pd.DataFrame(mlb.fit_transform(df['artist genres']),colu
 
 final_df = pd.concat([df,artist_genres_dummies], axis = 1)
 
-upload_data_to_mysql(df):
+final_df.drop(columns=['artist genres'], axis = 1, inplace = True)
+
+print(final_df.columns)
+
+logging.debug('Unpacked the artist genres into columns')
+logging.debug(f'The data set now has has {final_df.shape[0]} rows and {final_df.shape[1]} columns')
+
+final_df.to_csv(f"spotify_{today_date}.csv")
+
+# upload_data_to_mysql(final_df)

@@ -8,6 +8,11 @@ import json
 import openpyxl
 import logging
 
+import warnings
+warnings.filterwarnings('ignore')
+
+from sqlalchemy import *
+
 from datetime import datetime
 from decouple import config
 
@@ -34,6 +39,9 @@ def retrieve_track_ids(year):
 
 
 def getTrackFeatures(id):
+    client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
     meta = sp.track(id)
     features = sp.audio_features(id)
     audio_analysis = sp.audio_analysis(id)
@@ -99,7 +107,7 @@ def getTrackFeatures(id):
     return track
 
 
-    def upload_data_to_mysql(df):
+def upload_data_to_mysql(df):
     password = config('mysql_password')
     engine = create_engine(f'mysql+mysqlconnector://root:{password}@localhost:3306/spotify')
     connection = engine.connect()
