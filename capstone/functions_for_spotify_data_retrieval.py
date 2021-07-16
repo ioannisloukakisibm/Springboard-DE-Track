@@ -107,6 +107,13 @@ def getTrackFeatures(id):
     return track
 
 
+ISSUE:
+# VERBOSE SPOTIFY FUNCTION
+# See if the below works:
+# To avoid all the INFO logs from Spark appearing in the Console, set the log level as ERROR:
+
+# 1 spark.sparkContext.setLogLevel("ERROR")
+
 def upload_data_to_mysql(df):
     password = config('mysql_password')
     engine = create_engine(f'mysql+mysqlconnector://root:{password}@localhost:3306/spotify')
