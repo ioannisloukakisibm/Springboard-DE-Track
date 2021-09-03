@@ -16,6 +16,11 @@ from sqlalchemy import *
 from datetime import datetime
 from decouple import config
 
+from sklearn.preprocessing import MultiLabelBinarizer
+
+import mysql
+import mysql.connector
+
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
@@ -25,7 +30,7 @@ client_secret = config('spotify_client_secret')
 client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-def retrieve_track_ids(year):
+def retrieve_track_ids_iterator_function(year):
     list_of_track_ids = []
     for i in range(0,100000,50):
         try:
@@ -38,10 +43,23 @@ def retrieve_track_ids(year):
     return list_of_track_ids
 
 
-def getTrackFeatures(id):
-    client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
-    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+def retrieve_track_ids(lower_bound, upper_bound = datetime.now().year + 1):
 
+    year_list = list(np.arange(lower_bound,upper_bound))
+
+    track_ids = []
+
+    for year in year_list:
+        holder_list = []
+        holder_list = retrieve_track_ids_iterator_function(year)
+        track_ids.extend(holder_list)
+
+    logging.debug(f'pulled {len(track_ids)} track ids')
+
+    return track_ids
+
+
+def retrieve_track_features_iterator_function(id):
     meta = sp.track(id)
     features = sp.audio_features(id)
     audio_analysis = sp.audio_analysis(id)
@@ -107,22 +125,100 @@ def getTrackFeatures(id):
     return track
 
 
-ISSUE:
-# VERBOSE SPOTIFY FUNCTION
-# See if the below works:
-# To avoid all the INFO logs from Spark appearing in the Console, set the log level as ERROR:
+def retrieve_track_features(list_of_track_ids):
+    
+    list_of_track_features = []
+    
+    for i in range(len(list_of_track_ids)):
+    #     time.sleep(.5)
+        try:
+            track_features = retrieve_track_features_iterator_function(list_of_track_ids[i])
+            list_of_track_features.append(track_features)
+        except:
+            continue
 
-# 1 spark.sparkContext.setLogLevel("ERROR")
+    return list_of_track_features
+
+        
+def create_final_dataset(list_of_track_features):
+
+    df = pd.DataFrame(list_of_track_features, columns = [
+        'song_id', 'song name', 'album', 'artist', 'artist genres', 'artist popularity', 'artist number of followers'
+        ,'artist type', 'album label', 'album popularity', 'song release date', 'length', 'song popularity'
+        ,'key', 'mode', 'acousticness','valence', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness'
+        ,'speechiness','tempo', 'time signature', 'tempo confidence', 'key confidence', 'time signature confidence'
+        ,'mode confidence','rhythm version', 'synch version', 'number of segments', 'number of bars', 'number of beats'
+        ,'number of sections', 'number of tatums' 
+    ])
+
+    # Add a date of data pull
+    today_timestamp = pd.to_datetime("today")
+    today_date = today_timestamp.date()
+    df['date of data pull'] = today_date
+    df['date of data pull'] = pd.to_datetime(df['date of data pull'])
+
+    logging.debug(f'pulled the features of {df.shape[0]} tracks')
+
+    return df
+
 
 def upload_data_to_mysql(df):
     password = config('mysql_password')
     engine = create_engine(f'mysql+mysqlconnector://root:{password}@localhost:3306/spotify')
     connection = engine.connect()
+    logging.debug('Connection to MySQL was successful')
 
     try:
-        df.to_sql(name = 'main', con = engine, if_exists = 'fail', chunksize = 1000, index=False)
+        df.to_sql(name = 'song_attributes_raw', con = engine, if_exists = 'fail', chunksize = 1000, index=False)
         logging.debug('MySQL database was empty. Uploaded the latest dataset')
 
     except:
-        df.to_sql(name = 'main', con = engine, if_exists = 'append', chunksize = 1000, index=False)
+        df.to_sql(name = 'song_attributes_raw', con = engine, if_exists = 'append', chunksize = 1000, index=False)
         logging.debug(f'Uploaded {df.shape[0]} rows to the database')
+
+
+def get_db_connection():
+    connection = None
+    try:
+        password = config('mysql_password')
+
+        connection = mysql.connector.connect(
+            user='root'
+            ,password=f'{password}' 
+            ,host='localhost' 
+            ,port='3306' 
+            ,database='spotify')
+        logging.debug('Connection to MySQL was established')
+
+    except:
+        logging.critical('Failed to connect to MySQL Database')
+
+    return connection
+
+
+def delete_data_from_mysql():
+    sql_statement = "drop table if exists spotify.song_attributes_raw"
+    connection = get_db_connection()
+    cursor=connection.cursor()
+    cursor.execute(sql_statement)
+    records = cursor.fetchall()
+    cursor.close()
+
+    logging.debug(f'Table deleted from mysql database')
+
+    return None
+
+
+def retrieve_data_from_mysql():
+    sql_statement = "select * from spotify.song_attributes_raw"
+    connection = get_db_connection()
+    cursor=connection.cursor()
+    cursor.execute(sql_statement)
+    records = cursor.fetchall()
+    cursor.close()
+
+    database_dataset = pd.DataFrame(records, columns = list(cursor.column_names))
+
+    logging.debug(f'We pulled {database_dataset.shape[0]} rows from mysql database')
+
+    return database_dataset

@@ -79,3 +79,11 @@ t5 = PythonOperator(
     ,python_callable = query_apple_tesla()
     ,dag=dag
 )
+
+t0>>t1>>t3
+t0>>t2>>t4
+t3>>t5
+t4>>t5
+
+https://storage.googleapis.com/sp-springboard-resources-uploaded-images/uploads/resources/1619197358_SoDA_DEC_-_Airflow_Mini_Project__DAG_Exercise.pdf?Expires=1629206137&GoogleAccessId=storage-admin%40springboard-production.iam.gserviceaccount.com&Signature=pCv13dTLvQPfLn2OG1KvUzlk7lWRFAIWDurTmPVxqhLOYZOt0hnsRwK6P%2BEH7Mu8AyxNxgY2aIvO86Bbj9sHOsRH%2Be4JYTgCvCGMkCnjTHI3AW5DzYTmCqI5W29%2Fw%2F8VWxkpyWpRT1eGQS66SC9i1YN5VGIut6r6O70OyM%2FpKbZDoThXu8ZXk0K1UGRY7sLDD%2FWfckt6Tq4oXuVewsiRiBmy4cIgDVXT1NseWzBOqjzcQ0VCIiqJZmA%2B9KwfBTgZ2SP%2FAFO44F1HM8G3UheFavb7PK904qw4Ci4VKvHnbHA7bQdZ1cUWie6NaNQjqpBv7Ggmn89VIWsRjMBztGRqSg%3D%3D
+https://storage.googleapis.com/sp-springboard-resources-uploaded-images/uploads/resources/1619197674_SoDA_DEC_-_Airflow_Mini_Project__Log_analyzer.pdf?Expires=1629308946&GoogleAccessId=storage-admin%40springboard-production.iam.gserviceaccount.com&Signature=vBxJ9AvE7zBqWXWhWmeELsJXw839eDA8uw7mWrZJ1MLrkPEKro9aCQaQkGqLB7g%2Bt2MdxmkwYNV3sdSf7vdVQGll06%2BAbY%2F6l2iHk%2FsgWyTy0rR0zVUZWFNWickG53CXFn%2B7yo4SC%2FkGGaNcPoklN3wEerD6Ei%2BoKjpsszNnCHbpHd%2FJvxMP49K3Yg8WRWKoIv38sB153AdzNsaem1WhpMLkuI6SYOJq87GkibkMqH15NtJ5SD%2FZwW67mj21OGmXEXIUVZeeplL8Mrjn9of3zN1nS9yZCcalE%2FD%2BmMXHdoshXegjNXT6z6Ka4%2BUTUP2WDlh%2FsdNZQCHhYyeoolviWw%3D%3D
