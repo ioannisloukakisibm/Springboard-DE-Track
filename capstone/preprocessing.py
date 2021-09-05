@@ -141,12 +141,13 @@ def remove_duplication(input_df):
 def pre_modelling(df, list_of_dummy_columns, list_of_non_dummy_columns):
 
     list_of_dummy_columns.append('song_id')
+    list_of_dummy_columns.append('song release date')
     list_of_non_dummy_columns.remove('rhythm version')
     list_of_non_dummy_columns.remove('synch version')
  
-    df_baseline = df[list_of_non_dummy_columns].groupby('song_id', as_index = False).mean()
-    df_dummies =  df[list_of_dummy_columns].groupby('song_id', as_index = False).max()
-    merged = pd.merge(df_baseline, df_dummies, how = 'inner', on = ['song_id'])
+    df_baseline = df[list_of_non_dummy_columns].groupby(['song_id', 'song release date'], as_index = False).mean()
+    df_dummies =  df[list_of_dummy_columns].groupby(['song_id', 'song release date'], as_index = False).max()
+    merged = pd.merge(df_baseline, df_dummies, how = 'inner', on = ['song_id', 'song release date'])
 
     initial_n = df.shape[0]
     df_baseline_n = df_baseline.shape[0]
