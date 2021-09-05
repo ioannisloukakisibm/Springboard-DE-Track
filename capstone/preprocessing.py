@@ -10,8 +10,10 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+
 def dummy_variables(input_df, variable_for_dummies):
-    input_df['artist genres'] = input_df[variable_for_dummies].apply(lambda s: list(ast.literal_eval(s)))
+
+    input_df[variable_for_dummies] = input_df[variable_for_dummies].apply(lambda s: list(ast.literal_eval(s)))
     
     mlb = MultiLabelBinarizer()
     artist_genres_dummies = pd.DataFrame(mlb.fit_transform(input_df[variable_for_dummies])

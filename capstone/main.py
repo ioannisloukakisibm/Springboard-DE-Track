@@ -30,7 +30,7 @@ import time
 
 start_time = time.time()
 
-list_of_track_ids = retrieve_track_ids(2016)
+list_of_track_ids = retrieve_track_ids(2018)
 list_of_track_features = retrieve_track_features(list_of_track_ids)
 final_df = create_final_dataset(list_of_track_features)
 upload_data_to_mysql(final_df)
@@ -49,20 +49,14 @@ df_with_dummies_and_stds_and_no_outliers_clean = cleanup_dirty_data(
 df_with_dummies_and_stds_and_no_outliers_clean_deduped = remove_duplication(
     df_with_dummies_and_stds_and_no_outliers_clean)
 
-# df_with_dummies_and_stds_and_no_outliers_clean_deduped.to_csv('check if the pipeline run E2E DELETE.csv')
-
-
-
 final_df = pre_modelling(df_with_dummies_and_stds_and_no_outliers_clean_deduped
                         ,list_of_dummy_columns
                         ,list_of_non_dummy_columns
                         )
 
-final_df.to_csv('test_modeling DELETE.csv')
+# final_df.to_csv('test_modeling DELETE.csv')
 
-# start_time = time.time()
-
-final_df = pd.read_csv('test_modeling DELETE.csv')
+# final_df = pd.read_csv('test_modeling DELETE.csv')
 
 input_features = list(final_df.columns)
 input_features.remove('song_id')

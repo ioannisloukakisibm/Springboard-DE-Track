@@ -157,6 +157,8 @@ def create_final_dataset(list_of_track_features):
     df['date of data pull'] = today_date
     df['date of data pull'] = pd.to_datetime(df['date of data pull'])
 
+    df['artist genres'] = df['artist genres'].astype('str')
+
     logging.debug(f'pulled the features of {df.shape[0]} tracks')
 
     return df
