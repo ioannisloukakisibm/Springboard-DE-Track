@@ -28,9 +28,12 @@ from sklearn.preprocessing import MultiLabelBinarizer
 
 import time
 
+# df = spark_db_connection()
+# df.toPandas().to_csv('check.csv')
+
 start_time = time.time()
 
-list_of_track_ids = retrieve_track_ids(2018)
+list_of_track_ids = retrieve_track_ids(2019)
 list_of_track_features = retrieve_track_features(list_of_track_ids)
 final_df = create_final_dataset(list_of_track_features)
 upload_data_to_mysql(final_df)

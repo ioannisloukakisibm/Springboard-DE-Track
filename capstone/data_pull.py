@@ -21,6 +21,8 @@ from sklearn.preprocessing import MultiLabelBinarizer
 import mysql
 import mysql.connector
 
+from pyspark.sql import SparkSession
+
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
@@ -224,3 +226,17 @@ def retrieve_data_from_mysql():
     logging.debug(f'We pulled {database_dataset.shape[0]} rows from mysql database')
 
     return database_dataset
+
+
+def spark_db_connection():
+    
+    spark = SparkSession.builder.config("spark.jars", "C:\Program Files (x86)\MySQL\Connector J 8.0\mysql-connector-java-8.0.26.jar") \
+    .master("local").appName("PySpark_MySQL_test").getOrCreate()
+
+    df = spark.read.format("jdbc").option("url", "jdbc:mysql://localhost:3306/spotify") \
+    .option("driver", "com.mysql.jdbc.Driver").option("dbtable", "song_attributes_raw") \
+    .option("user", "root").option("password", config('mysql_password')).load()
+
+    spark.stop()
+
+    return df

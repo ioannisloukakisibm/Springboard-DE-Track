@@ -1,40 +1,80 @@
-version: '3'
+version: '2.1'
 services:
+
+######################################################
+# DATABASE SERVICE
+######################################################
   postgres:
-    image: postgres:9.6
+    build: './docker/postgres'
+    restart: always
+    container_name: postgres
+    logging:
+      driver: "json-file"
+      options:
+          max-file: "5"
+          max-size: "10m"
+    ports:
+      - "32769:5432"
+    #volumes:
+      #- ./mnt/postgres:/var/lib/postgresql/data/pgdata
     environment:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
-    ports:
-      - "5432:5432"
-
-  webserver:
-    image: puckel/docker-airflow:1.10.1
-    build:
-      context: https://github.com/puckel/docker-airflow.git#1.10.1
-      dockerfile: Dockerfile
-      args:
-        AIRFLOW_DEPS: gcp_api,s3
-        PYTHON_DEPS: sqlalchemy==1.2.0
-    restart: always
-    depends_on:
-      - postgres
-    environment:
-      - LOAD_EX=n
-      - EXECUTOR=Local
-      - FERNET_KEY=jsDPRErfv8Z_eVTnGfF8ywd19j4pyqE3NpdUBA_oRTo=
-    volumes:
-      # - ./examples/intro-example/dags:/usr/local/airflow/dags
-      - ./C:\Users\IoannisLoukakis\Springboard\Airflow Mini Project 1\DAGS:/usr/local/airflow/dags
-# Uncomment to include custom plugins
-      # - ./plugins:/usr/local/airflow/plugins
-    ports:
-      # - "8080:8080"
-      - "9191:8080"
-    command: webserver
+      - POSTGRES_DB=airflow_db
+      #- PGDATA=/var/lib/postgresql/data/pgdata
     healthcheck:
-      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
+      test: [ "CMD", "pg_isready", "-q", "-d", "airflow_db", "-U", "airflow" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+
+  adminer:
+    image: wodby/adminer:latest
+    restart: always
+    container_name: adminer
+    logging:
+      driver: "json-file"
+      options:
+          max-file: "5"
+          max-size: "10m"
+    ports:
+      - "32767:9000"
+    environment:
+      - ADMINER_DEFAULT_DB_DRIVER=psql
+      - ADMINER_DEFAULT_DB_HOST=postgres
+      - ADMINER_DEFAULT_DB_NAME=airflow_db
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "adminer", "9000" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+
+######################################################
+# AIRFLOW
+######################################################
+
+  airflow:
+  # This one builds a dockerfile located in the path below:
+    build: ./docker/airflow
+    restart: always
+    container_name: airflow
+    volumes:
+      - ./mnt/airflow/airflow.cfg:/opt/airflow/airflow.cfg
+      - ./mnt/airflow/dags:/opt/airflow/dags
+    ports:
+      - 9090:8080
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "airflow", "8080" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+
+######################################################
+# NETWORK
+######################################################
+
+# Change name of default network otherwise URI invalid for HIVE
+# because of the _ contained by default network
+networks:
+  default:
+    name: airflow-network

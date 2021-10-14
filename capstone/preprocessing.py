@@ -10,6 +10,16 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+import findspark
+findspark.init()
+findspark.find()
+
+import pyspark
+findspark.find()
+
+from pyspark import SparkContext, SparkConf
+from pyspark.sql import SparkSession
+
 
 def dummy_variables(input_df, variable_for_dummies):
 
