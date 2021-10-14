@@ -64,6 +64,7 @@ final_df = pre_modelling(df_with_dummies_and_stds_and_no_outliers_clean_deduped
 input_features = list(final_df.columns)
 input_features.remove('song_id')
 input_features.remove('song release date')
+input_features.remove('song popularity')
 
 train, validation, test = split_train_validation_test(final_df)
 selected_rf_features = select_appropriate_features_rf(train, 'song popularity', input_features)
