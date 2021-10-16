@@ -3,3 +3,6 @@
 *.csv
 .env
 .cache
+env.list
+*airflowlogs*
+
