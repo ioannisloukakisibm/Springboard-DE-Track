@@ -22,8 +22,6 @@ from sqlalchemy import *
 from datetime import datetime
 from decouple import config
 
-from mpire import WorkerPool
-
 from sklearn.preprocessing import MultiLabelBinarizer
 
 import time
@@ -33,7 +31,7 @@ import time
 
 start_time = time.time()
 
-list_of_track_ids = retrieve_track_ids(2019)
+list_of_track_ids = retrieve_track_ids(2021)
 list_of_track_features = retrieve_track_features(list_of_track_ids)
 final_df = create_final_dataset(list_of_track_features)
 upload_data_to_mysql(final_df)

@@ -7,9 +7,9 @@ warnings.filterwarnings("ignore")
 
 from datetime import datetime, timedelta, date
 
-from data_pull_airflow import *
-from preprocessing_airflow import *
-from modeling_airflow import *
+from scripts.data_pull_airflow import *
+from scripts.preprocessing_airflow import *
+from scripts.modeling_airflow import *
 
 from airflow.models import DAG
 from airflow.operators.bash_operator import BashOperator
