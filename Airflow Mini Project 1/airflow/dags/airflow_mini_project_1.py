@@ -44,13 +44,15 @@ def stock(stock_symbol):
 
 t1 = PythonOperator(
     task_id = 'download_apple'
-    ,python_callable = stock('AAPL')
+    ,python_callable = stock
+    ,op_kwargs={'stock_symbol':'AAPL'}
     ,dag=dag
 )
 
 t2 = PythonOperator(
     task_id = 'download_tesla'
-    ,python_callable = stock('TSLA')
+    ,python_callable = stock
+    ,op_kwargs={'stock_symbol':'TSLA'}
     ,dag=dag
 )
 
@@ -73,7 +75,7 @@ def query_apple_tesla():
 
 t5 = PythonOperator(
     task_id = 'query_data'
-    ,python_callable = query_apple_tesla()
+    ,python_callable = query_apple_tesla
     ,dag=dag
 )
 
