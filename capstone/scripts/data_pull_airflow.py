@@ -21,7 +21,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 import mysql
 import mysql.connector
 
-from pyspark.sql import SparkSession
+# from pyspark.sql import SparkSession
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -140,7 +140,7 @@ def retrieve_track_features_and_create_df():
 
     list_of_track_features = []
     
-    for i in range(len(list_of_track_ids)):
+    for i in range(len(list_of_track_ids[:5])):
     #     time.sleep(.5)
         try:
             track_features = retrieve_track_features_iterator_function(list_of_track_ids[i])
@@ -165,9 +165,9 @@ def retrieve_track_features_and_create_df():
 
     df['artist genres'] = df['artist genres'].astype('str')
 
-    logging.debug(f'pulled the features of {df.shape[0]} tracks')
-
     df.to_csv('final_raw_data_pull_from_api.csv')
+
+    logging.debug(f'pulled the features of {df.shape[0]} tracks')
 
     return None
 
@@ -239,15 +239,15 @@ def retrieve_data_from_mysql():
     return None
 
 
-def spark_db_connection():
+# def spark_db_connection():
     
-    spark = SparkSession.builder.config("spark.jars", "C:\Program Files (x86)\MySQL\Connector J 8.0\mysql-connector-java-8.0.26.jar") \
-    .master("local").appName("PySpark_MySQL_test").getOrCreate()
+#     spark = SparkSession.builder.config("spark.jars", "C:\Program Files (x86)\MySQL\Connector J 8.0\mysql-connector-java-8.0.26.jar") \
+#     .master("local").appName("PySpark_MySQL_test").getOrCreate()
 
-    df = spark.read.format("jdbc").option("url", "jdbc:mysql://localhost:3306/spotify") \
-    .option("driver", "com.mysql.jdbc.Driver").option("dbtable", "song_attributes_raw") \
-    .option("user", "root").option("password", config('mysql_password')).load()
+#     df = spark.read.format("jdbc").option("url", "jdbc:mysql://localhost:3306/spotify") \
+#     .option("driver", "com.mysql.jdbc.Driver").option("dbtable", "song_attributes_raw") \
+#     .option("user", "root").option("password", config('mysql_password')).load()
 
-    spark.stop()
+#     spark.stop()
 
-    return df
+#     return df

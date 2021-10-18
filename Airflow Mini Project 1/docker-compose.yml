@@ -9,8 +9,8 @@ services:
     
     webserver:
         image: webserver:latest
-        build: ./docker/airflow
-          # context: .
+        build:
+          context: .
         restart: always
         depends_on:
             - postgres
@@ -22,13 +22,13 @@ services:
         env_file:
           - env.list
         volumes:
-            - ./mnt/airflow/dags:/usr/local/airflow/dags
-            - ./mnt/scripts:/usr/local/airflow/scripts
-            - ./mnt/tmp_data:/usr/local/tmp_data
-            - ./mnt/finance_data:/usr/local/finance_data
-            - ./mnt/airflowlogs:/usr/local/airflow/logs
+            - ./airflow/dags:/usr/local/airflow/dags
+            - ./scripts:/usr/local/airflow/scripts
+            - ./tmp_data:/usr/local/tmp_data
+            - ./finance_data:/usr/local/finance_data
+            - ./airflowlogs:/usr/local/airflow/logs
         ports:
-            - "9091:8080"
+            - "9090:8080"
         command: webserver
         healthcheck:
             test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
@@ -38,17 +38,17 @@ services:
 
     scheduler:
         image: scheduler:latest
-        build: ./docker/airflow
-          # context: .
+        build:
+          context: .
         restart: always
         depends_on:
             - webserver
         volumes:
-            - ./mnt/airflow/dags:/usr/local/airflow/dags
-            - ./mnt/scripts:/usr/local/airflow/scripts
-            - ./mnt/tmp_data:/usr/local/tmp_data
-            - ./mnt/finance_data:/usr/local/finance_data
-            - ./mnt/airflowlogs:/usr/local/airflow/logs
+            - ./airflow/dags:/usr/local/airflow/dags
+            - ./scripts:/usr/local/airflow/scripts
+            - ./tmp_data:/usr/local/tmp_data
+            - ./finance_data:/usr/local/finance_data
+            - ./airflowlogs:/usr/local/airflow/logs
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
