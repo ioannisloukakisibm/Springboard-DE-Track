@@ -5,4 +5,24 @@
 .cache
 env.list
 *airflowlogs*
+*.pem
+*.frm
+*.MYD
+*.MYI
+*.CSM
+*.ibd
+*.opt
+*.TRN
+*.TRG
+*.cnf
+*logfile*
+*ibdata*
+*ib_buffer_pool*
+*ibtmp*
+
+
+
+
+
+
 

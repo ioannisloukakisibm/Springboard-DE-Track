@@ -6,6 +6,33 @@ services:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
+        volumes:
+            - ./postgress_data:/usr/local/postgress_data
+
+    db:
+        image: mysql:5.7
+        restart: always
+        environment:
+            MYSQL_DATABASE: 'db'
+            # So you don't have to use root, but you can if you like
+            MYSQL_USER: 'user'
+            # You can use whatever password you like
+            MYSQL_PASSWORD: 'password'
+            # Password for root access
+            MYSQL_ROOT_PASSWORD: 'password'
+        ports:
+            # <Port exposed> : < MySQL Port running inside container>
+            - '3307:3306'
+        expose:
+            # Opens port 3306 on the container
+            - '3306'
+            # Where our data will be persisted
+        volumes:
+            - ./mysql_data:/var/lib/mysql
+    # Names our volume
+    # volumes:
+    #     my-db:
+
     
     webserver:
         image: webserver:latest
@@ -34,6 +61,11 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
+        extra_hosts:
+            # - dockerhost:docker.for.win.localhost
+            - dockerhost:127.0.0.1
+
+
 
     scheduler:
         image: scheduler:latest
