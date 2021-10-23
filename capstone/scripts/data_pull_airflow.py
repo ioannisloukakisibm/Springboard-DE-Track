@@ -61,7 +61,7 @@ def retrieve_track_ids(lower_bound, upper_bound = datetime.now().year + 1):
 
     df_of_track_ids = pd.DataFrame({'track_id':track_ids})
 
-    df_of_track_ids.to_csv('track_ids.csv')
+    df_of_track_ids.to_csv('/usr/local/tmp_data/track_ids.csv')
 
     return None
 
@@ -134,13 +134,13 @@ def retrieve_track_features_iterator_function(id):
 
 def retrieve_track_features_and_create_df():
 
-    df_of_track_ids = pd.read_csv('track_ids.csv')
+    df_of_track_ids = pd.read_csv('/usr/local/tmp_data/track_ids.csv')
     
     list_of_track_ids = list(df_of_track_ids['track_id'])
 
     list_of_track_features = []
     
-    for i in range(len(list_of_track_ids[:5])):
+    for i in range(len(list_of_track_ids)):
     #     time.sleep(.5)
         try:
             track_features = retrieve_track_features_iterator_function(list_of_track_ids[i])
@@ -165,7 +165,7 @@ def retrieve_track_features_and_create_df():
 
     df['artist genres'] = df['artist genres'].astype('str')
 
-    df.to_csv('final_raw_data_pull_from_api.csv')
+    df.to_csv('/usr/local/tmp_data/final_raw_data_pull_from_api.csv')
 
     logging.debug(f'pulled the features of {df.shape[0]} tracks')
 
@@ -174,7 +174,7 @@ def retrieve_track_features_and_create_df():
 
 def upload_data_to_mysql():
 
-    df = pd.read_csv('final_raw_data_pull_from_api.csv')
+    df = pd.read_csv('/usr/local/tmp_data/final_raw_data_pull_from_api.csv')
 
     password = config('mysql_password')
     engine = create_engine(f'mysql+mysqlconnector://root:{password}@localhost:3306/spotify')
@@ -234,7 +234,7 @@ def retrieve_data_from_mysql():
 
     logging.debug(f'We pulled {database_dataset.shape[0]} rows from mysql database')
 
-    database_dataset.to_csv('entire df from database.csv')
+    database_dataset.to_csv('/usr/local/tmp_data/entire df from database.csv')
 
     return None
 
