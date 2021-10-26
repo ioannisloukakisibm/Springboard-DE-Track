@@ -10,9 +10,9 @@ import openpyxl
 import logging
 import ast
 
-from data_pull import *
-from preprocessing import *
-from modeling import *
+from scripts.data_pull import *
+from scripts.preprocessing import *
+from scripts.modeling import *
 
 import warnings
 warnings.filterwarnings('ignore')

@@ -8,38 +8,8 @@ services:
             - POSTGRES_DB=airflow
         volumes:
             - ./postgress_data:/usr/local/postgress_data
-
-        # # Unsupported config option for services.postgres: 'network'
-        # network:
-        #     host
-
         extra_hosts:
             - "host.docker.internal:host-gateway"
-
-    # db:
-    #     image: mysql:5.7
-    #     restart: always
-    #     environment:
-    #         MYSQL_DATABASE: 'db'
-    #         # So you don't have to use root, but you can if you like
-    #         MYSQL_USER: 'user'
-    #         # You can use whatever password you like
-    #         MYSQL_PASSWORD: 'password'
-    #         # Password for root access
-    #         MYSQL_ROOT_PASSWORD: 'password'
-    #     ports:
-    #         # <Port exposed> : < MySQL Port running inside container>
-    #         - '3307:3306'
-    #     expose:
-    #         # Opens port 3306 on the container
-    #         - '3306'
-    #         # Where our data will be persisted
-    #     volumes:
-    #         - ./mysql_data:/var/lib/mysql
-    #     network_mode: "host"
-    # # Names our volume
-    # # volumes:
-    # #     my-db:
 
     
     webserver:
@@ -54,8 +24,6 @@ services:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Local
             - PYTHONPATH=/usr/local/airflow
-            #   DB_UPSTREAM: http://${DOCKER_GATEWAY_HOST:-host.docker.internal}:3000
-        
         env_file:
           - env.list
         volumes:
@@ -71,19 +39,8 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-
-        # # Unsupported config option for services.postgres: 'network'
-        # network:
-        #     host
-
-        # network: host.docker.internal
-        # network_mode: "host"
-        # extra_hosts:
-        #     # - dockerhost:docker.for.win.localhost
-        #     - dockerhost:127.0.0.1
         extra_hosts:
             - "host.docker.internal:host-gateway"
-
 
 
     scheduler:
@@ -103,15 +60,9 @@ services:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Local
             - PYTHONPATH=/usr/local/airflow
-            # DB_UPSTREAM: http://${DOCKER_GATEWAY_HOST:-host.docker.internal}:3000
 
         command: scheduler
         env_file:
           - env.list
-        
-        # Unsupported config option for services.postgres: 'network'
-        # network:
-        #     host
-        # network_mode: "host"
         extra_hosts:
             - "host.docker.internal:host-gateway"
