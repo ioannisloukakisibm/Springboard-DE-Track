@@ -112,7 +112,7 @@ def select_appropriate_features_xgb(target):
     return None
 
 
-def train_model_rf(target, **context):
+def train_model_rf(target):
 
     input_df = pd.read_csv('/usr/local/tmp_data/train.csv')
     selected_rf_features_df = pd.read_csv('/usr/local/tmp_data/selected_rf_features.csv')
@@ -130,14 +130,12 @@ def train_model_rf(target, **context):
 
     rf_importance.to_csv('/usr/local/tmp_data/rf_feature_importance.csv')  
 
-    context['ti'].xcom_push(key='random_forest_model', value=fitted_rf) 
-
     logging.debug(f'Random Forest model was trained successfully')
 
-    return None
+    return fitted_rf
 
 
-def train_model_xgb(target, **context):
+def train_model_xgb(target):
 
     input_df = pd.read_csv('/usr/local/tmp_data/train.csv')
     selected_xgb_features_df = pd.read_csv('/usr/local/tmp_data/selected_xgb_features.csv')
@@ -154,46 +152,12 @@ def train_model_xgb(target, **context):
 
     xgb_importance.to_csv('/usr/local/tmp_data/xgb_feature_importance.csv')  
 
-    context['ti'].xcom_push(key='xgboost_model', value=fitted_xgb) 
-
     logging.debug(f'XGBoost model was trained successfully')
 
-    return None
+    return fitted_xgb
 
 
-def generate_predictions_rf_xgb(target, input_df_to_read, **context):
-
-    input_df = pd.read_csv(input_df_to_read)
-    selected_rf_features_df = pd.read_csv('/usr/local/tmp_data/selected_rf_features.csv')
-    selected_rf_features = list(selected_rf_features_df['var_name'])
-    selected_xgb_features_df = pd.read_csv('/usr/local/tmp_data/selected_xgb_features.csv')
-    selected_xgb_features = list(selected_xgb_features_df['var_name'])
-
-    fitted_rf = context['ti'].xcom_pull(key='random_forest_model') 
-    fitted_xgb = context['ti'].xcom_pull(key='xgboost_model') 
-
-    validation_rf = input_df[selected_rf_features]
-    predictions_rf = fitted_rf.predict(validation_rf)
-
-    validation_xgb = input_df[selected_xgb_features]
-    predictions_xgb = fitted_xgb.predict(validation_xgb)
-
-    outcomes = pd.DataFrame({
-        'actuals': list(input_df[target])
-        , 'Random Forest': list(predictions_rf)
-        , 'XGBoost': list(predictions_xgb)
-    })
-
-    outcomes.to_csv('/usr/local/tmp_data/rf_xgb_validation_predictions.csv')
-
-    logging.debug(f'Predictions were successfully generated')
-
-    return None
-
-
-def calculate_weights(**context):
-
-    input_df = pd.read_csv('/usr/local/tmp_data/rf_xgb_validation_predictions.csv')
+def calculate_weights(input_df):
 
     errors_rf = np.abs(input_df['Random Forest'] - input_df['actuals'])
     mape_rf = (errors_rf / input_df['actuals'])
@@ -208,29 +172,88 @@ def calculate_weights(**context):
     weight_rf = accuracy_rf/(accuracy_rf + accuracy_xgb) 
     weight_xgb = accuracy_xgb/(accuracy_rf + accuracy_xgb) 
 
-    context['ti'].xcom_push(key='weight_rf', value=weight_rf) 
-    context['ti'].xcom_push(key='weight_xgb', value=weight_xgb) 
-
-    return None
+    return weight_rf, weight_xgb
 
 
-def final_ensemble_prediction(target, **context):
 
-    test_df = pd.read_csv('/usr/local/tmp_data/test.csv')
+def generate_predictions_rf_xgb(target):
 
-    weight_rf = context['ti'].xcom_pull(key='weight_rf') 
-    weight_xgb = context['ti'].xcom_pull(key='weight_xgb') 
+    validation_input_df = pd.read_csv('/usr/local/tmp_data/validation.csv')
+    test_input_df = pd.read_csv('/usr/local/tmp_data/test.csv')
+    selected_rf_features_df = pd.read_csv('/usr/local/tmp_data/selected_rf_features.csv')
+    selected_rf_features = list(selected_rf_features_df['var_name'])
+    selected_xgb_features_df = pd.read_csv('/usr/local/tmp_data/selected_xgb_features.csv')
+    selected_xgb_features = list(selected_xgb_features_df['var_name'])
 
-    outcomes = generate_predictions_rf_xgb(test_df ,target)
+    fitted_rf = train_model_rf(target) 
+    fitted_xgb = train_model_xgb(target) 
 
-    outcomes['ensemble_prediction'] = outcomes['Random Forest']*weight_rf + outcomes['XGBoost']*weight_xgb
-    outcomes['delta prediction'] = outcomes['ensemble_prediction'] - outcomes['actuals']
+    validation_x_rf = validation_input_df[selected_rf_features]
+    validation_y_rf = fitted_rf.predict(validation_x_rf)
 
-    outcomes.sort_values(by = ['delta prediction'], ascending = False, inplace = True)
+    validation_x_xgb = validation_input_df[selected_xgb_features]
+    validation_y_xgb = fitted_xgb.predict(validation_x_xgb)
+
+    validation_outcomes = pd.DataFrame({
+        'actuals': list(validation_input_df[target])
+        , 'Random Forest': list(validation_y_rf)
+        , 'XGBoost': list(validation_y_xgb)
+    })
+
+    logging.debug(f'Validation successfully completed')
+
+    weight_rf, weight_xgb = calculate_weights(validation_outcomes)
+
+    test_x_rf = test_input_df[selected_rf_features]
+    test_y_rf = fitted_rf.predict(test_x_rf)
+
+    test_x_xgb = test_input_df[selected_xgb_features]
+    test_y_xgb = fitted_xgb.predict(test_x_xgb)
+
+    test_outcomes = pd.DataFrame({
+        'song_id': list(test_input_df['song_id'])
+        # ,'song name': list(test_input_df['song name'])
+        # ,'Artist': list(test_input_df['artist'])
+        ,'actuals': list(test_input_df[target])
+        , 'Random Forest': list(test_y_rf)
+        , 'XGBoost': list(test_y_xgb)
+    })
+
+    test_outcomes['ensemble_prediction'] = test_outcomes['Random Forest']*weight_rf + test_outcomes['XGBoost']*weight_xgb
+    test_outcomes['delta prediction'] = test_outcomes['ensemble_prediction'] - test_outcomes['actuals']
+
+    test_outcomes.sort_values(by = ['delta prediction'], ascending = False, inplace = True)
 
     logging.debug(f'Predictions were successfully generated')
     logging.debug(f'The ensemble was weighted as {weight_rf} on the Random Forest and {weight_xgb} on the XGBoost')
 
-    outcomes.to_csv('/usr/local/tmp_data/final_predictions.csv')
+    test_outcomes.to_csv('/usr/local/tmp_data/final_predictions.csv', index = False)
 
-    return None     
+    return None
+
+# def final_formating():
+
+#     predictions = pd.read_csv('/usr/local/tmp_data/final_predictions.csv', index = False)
+#     baseline = pd.read_csv('entire df from database.csv', usecols = ['song_id','song name', 'artist'])
+
+
+
+
+# def final_ensemble_prediction(input_df, target, **context):
+
+#     weight_rf = context['ti'].xcom_pull(key='weight_rf') 
+#     weight_xgb = context['ti'].xcom_pull(key='weight_xgb') 
+
+#     outcomes = generate_predictions_rf_xgb(target, input_df)
+
+#     outcomes['ensemble_prediction'] = outcomes['Random Forest']*weight_rf + outcomes['XGBoost']*weight_xgb
+#     outcomes['delta prediction'] = outcomes['ensemble_prediction'] - outcomes['actuals']
+
+#     outcomes.sort_values(by = ['delta prediction'], ascending = False, inplace = True)
+
+#     logging.debug(f'Predictions were successfully generated')
+#     logging.debug(f'The ensemble was weighted as {weight_rf} on the Random Forest and {weight_xgb} on the XGBoost')
+
+#     outcomes.to_csv('/usr/local/tmp_data/final_predictions.csv')
+
+#     return None     

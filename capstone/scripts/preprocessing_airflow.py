@@ -23,7 +23,7 @@ logger.setLevel(logging.DEBUG)
 
 def dummy_variables(variable_for_dummies):
 
-    input_df = pd.read_csv('entire df from database.csv') 
+    input_df = pd.read_csv('/usr/local/tmp_data/entire df from database.csv') 
 
     input_df[variable_for_dummies] = input_df[variable_for_dummies].apply(lambda s: list(ast.literal_eval(s)))
     
@@ -40,9 +40,9 @@ def dummy_variables(variable_for_dummies):
     dummy_variables = pd.DataFrame({'var_name':list_of_dummy_columns})
     non_dummy_variables = pd.DataFrame({'var_name':list_of_non_dummy_columns})
 
-    merged.to_csv('df_with_genre_dummies.csv')
-    dummy_variables.to_csv('dummy_variables.csv')
-    non_dummy_variables.to_csv('non_dummy_variables.csv')
+    merged.to_csv('/usr/local/tmp_data/df_with_genre_dummies.csv', index = False)
+    dummy_variables.to_csv('/usr/local/tmp_data/dummy_variables.csv', index = False)
+    non_dummy_variables.to_csv('/usr/local/tmp_data/non_dummy_variables.csv', index = False)
 
     logging.debug(f'Dummy variables were successfully created')
 
@@ -51,21 +51,21 @@ def dummy_variables(variable_for_dummies):
 
 def missingness():
 
-    input_df = pd.read_csv('df_with_genre_dummies.csv') 
+    input_df = pd.read_csv('/usr/local/tmp_data/df_with_genre_dummies.csv') 
 
     input_df.fillna({'album label':'no info', 'artist number of followers':0}, inplace = True)
     input_df.dropna(inplace = True)
 
     logging.debug(f'The data set has now 0 missing values in all fields')
 
-    input_df.to_csv('df_with_genre_dummies_and_no_missing.csv')
+    input_df.to_csv('/usr/local/tmp_data/df_with_genre_dummies_and_no_missing.csv', index = False)
 
     return None
 
 
 def calculate_stds():
 
-    input_df = pd.read_csv('df_with_genre_dummies_and_no_missing.csv') 
+    input_df = pd.read_csv('/usr/local/tmp_data/df_with_genre_dummies_and_no_missing.csv') 
 
     std_vars = ['artist popularity', 'artist number of followers', 'album popularity', 'song popularity']
     std_vars_2 = []
@@ -80,15 +80,15 @@ def calculate_stds():
 
     std_variables = pd.DataFrame({'var_name':std_vars_2})
 
-    std_variables.to_csv('std_variables.csv')
-    input_df.to_csv('df_with_genre_dummies_no_missing_and_std.csv')
+    std_variables.to_csv('/usr/local/tmp_data/std_variables.csv', index = False)
+    input_df.to_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_and_std.csv', index = False)
 
     return None
 
 
 def outliers():
 
-    input_df = pd.read_csv('df_with_genre_dummies_no_missing_and_std.csv')
+    input_df = pd.read_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_and_std.csv')
 
     df1 = input_df.copy()
     original_df_size = df1.shape[0]
@@ -111,15 +111,15 @@ def outliers():
 
     logging.debug(f'Outliers were successfully removed: The Data Frame lost {original_df_size - processed_df_size} obs to a total of {processed_df_size}')
 
-    df1.to_csv('df_with_genre_dummies_no_missing_std_and_no_outliers.csv')
+    df1.to_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_std_and_no_outliers.csv', index = False)
 
     return None
 
 
 def cleanup_dirty_data():
 
-    df1 = pd.read_csv('df_with_genre_dummies_no_missing_std_and_no_outliers.csv')
-    std_vars_df = pd.read_csv('std_variables.csv')
+    df1 = pd.read_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_std_and_no_outliers.csv')
+    std_vars_df = pd.read_csv('/usr/local/tmp_data/std_variables.csv')
     std_vars = list(std_vars_df['var_name'])
 
     original_df_size = df1.shape[0]
@@ -128,7 +128,7 @@ def cleanup_dirty_data():
 
     for std_var in std_vars:
  
-        pctl = input_df[std_var].describe(percentiles=np.linspace(0,1,101))
+        pctl = df1[std_var].describe(percentiles=np.linspace(0,1,101))
         d[f'{std_var} 90th'] = pctl[94]
         d[f'{std_var} 95th'] = pctl[99]
         d[f'{std_var} 99th'] = pctl[103]
@@ -149,7 +149,7 @@ def cleanup_dirty_data():
 
     processed_df_size = df1.shape[0]
 
-    df1.to_csv('df_with_genre_dummies_no_missing_std_no_outliers_cleaned.csv')
+    df1.to_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_std_no_outliers_cleaned.csv', index = False)
 
     logging.debug(f'dirty obs were successfully removed: The Data Frame lost {original_df_size - processed_df_size} obs to a total of {processed_df_size}')
 
@@ -158,7 +158,7 @@ def cleanup_dirty_data():
 
 def remove_duplication():
 
-    df1= pd.read_csv('df_with_genre_dummies_no_missing_std_no_outliers_cleaned.csv')
+    df1= pd.read_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_std_no_outliers_cleaned.csv')
 
     original_df_size = df1.shape[0]
 
@@ -172,7 +172,7 @@ def remove_duplication():
 
     processed_df_size = df1.shape[0]
 
-    df1.to_csv('df_with_genre_dummies_no_missing_std_no_outliers_cleaned_dedupped.csv')
+    df1.to_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_std_no_outliers_cleaned_dedupped.csv', index = False)
 
     logging.debug(f'Duplicates were successfully removed: The Data Frame lost {original_df_size - processed_df_size} obs to a total of {processed_df_size}')
 
@@ -181,9 +181,9 @@ def remove_duplication():
 
 def pre_modelling():
 
-    df = pd.read_csv('df_with_genre_dummies_no_missing_std_no_outliers_cleaned_dedupped.csv')
-    dummy_variables_df = pd.read_csv('dummy_variables.csv')
-    non_dummy_variables_df = pd.read_csv('non_dummy_variables.csv')
+    df = pd.read_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_std_no_outliers_cleaned_dedupped.csv')
+    dummy_variables_df = pd.read_csv('/usr/local/tmp_data/dummy_variables.csv')
+    non_dummy_variables_df = pd.read_csv('/usr/local/tmp_data/non_dummy_variables.csv')
 
     list_of_dummy_columns = list(dummy_variables_df['var_name'])
     list_of_non_dummy_columns = list(non_dummy_variables_df['var_name'])
@@ -202,7 +202,7 @@ def pre_modelling():
     df_dummies_n = df_dummies.shape[0]
     merged_n = merged.shape[0]
 
-    merged.to_csv('df_with_genre_dummies_no_missing_std_no_outliers_cleaned_dedupped_ready_for_modeling.csv')
+    merged.to_csv('/usr/local/tmp_data/df_with_genre_dummies_no_missing_std_no_outliers_cleaned_dedupped_ready_for_modeling.csv', index = False)
 
     if (df_baseline_n == df_dummies_n) & (df_baseline_n == merged_n):
         logging.debug(f'The final merge was successfully completed: No data was lost')

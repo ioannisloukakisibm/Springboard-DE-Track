@@ -61,7 +61,7 @@ def retrieve_track_ids(lower_bound, upper_bound = datetime.now().year + 1):
 
     df_of_track_ids = pd.DataFrame({'track_id':track_ids})
 
-    df_of_track_ids.to_csv('/usr/local/tmp_data/track_ids.csv')
+    df_of_track_ids.to_csv('/usr/local/tmp_data/track_ids.csv', index = False)
 
     return None
 
@@ -165,11 +165,12 @@ def retrieve_track_features_and_create_df():
 
     df['artist genres'] = df['artist genres'].astype('str')
 
-    df.to_csv('/usr/local/tmp_data/final_raw_data_pull_from_api.csv')
+    df.to_csv('/usr/local/tmp_data/final_raw_data_pull_from_api.csv', index = False)
 
     logging.debug(f'pulled the features of {df.shape[0]} tracks')
 
     return None
+
 
 
 def upload_data_to_mysql():
@@ -177,7 +178,10 @@ def upload_data_to_mysql():
     df = pd.read_csv('/usr/local/tmp_data/final_raw_data_pull_from_api.csv')
 
     password = config('mysql_password')
-    engine = create_engine(f'mysql+mysqlconnector://root:{password}@localhost:3306/spotify')
+
+    # We need to modify this from local host to the docker host so that the code can run from the container
+    # engine = create_engine(f'mysql+mysqlconnector://root:{password}@localhost:3306/spotify')
+    engine = create_engine(f'mysql+mysqlconnector://root:{password}@host.docker.internal:3306/spotify')
     connection = engine.connect()
     logging.debug('Connection to MySQL was successful')
 
@@ -198,7 +202,7 @@ def get_db_connection():
         connection = mysql.connector.connect(
             user='root'
             ,password=f'{password}' 
-            ,host='localhost' 
+            ,host='host.docker.internal' 
             ,port='3306' 
             ,database='spotify')
         logging.debug('Connection to MySQL was established')
@@ -223,7 +227,7 @@ def delete_data_from_mysql():
 
 
 def retrieve_data_from_mysql():
-    sql_statement = "select * from spotify.song_attributes_raw"
+    sql_statement = "select * from spotify.song_attributes_raw limit 420000"
     connection = get_db_connection()
     cursor=connection.cursor()
     cursor.execute(sql_statement)
@@ -234,7 +238,7 @@ def retrieve_data_from_mysql():
 
     logging.debug(f'We pulled {database_dataset.shape[0]} rows from mysql database')
 
-    database_dataset.to_csv('/usr/local/tmp_data/entire df from database.csv')
+    database_dataset.to_csv('/usr/local/tmp_data/entire df from database.csv', index = False)
 
     return None
 
