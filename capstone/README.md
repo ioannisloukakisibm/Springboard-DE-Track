@@ -27,7 +27,12 @@ Project is created with:
 
 If for some strange reason someone wants to clone this repo, all you have to do is run the main program as seen below to execute the program locally (ie not deployed using docker or airflow, but run manually). CAVEAT: You need to install a local instance of a MYSQL database and update the credentials in the code, as well as apply for the Spotify API credentials (Free) and update these in the code as well. 
 
-'''
-python main.py
-'''
 
+```
+python main.py
+
+```
+
+### TEST
+
+# TEST
