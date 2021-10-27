@@ -1,9 +1,5 @@
 
 
-I need a configuration for postgress in airflow to know where the postgres is
-Add a healthcheck to determine if its running.
-Make sure Airflow's metadata is in postgress
-
 ## Table of contents
 * [General Info](#general-info)
 * [Description](#description)
@@ -32,6 +28,14 @@ If for some strange reason someone wants to clone this repo, all you have to do 
 python main.py
 ```
 
-### TEST
+## Folder description
 
-# TEST
+* airflow: Contains the dag for the project as well as the airflow configuration file
+* scripts: It contains the 3 different scripts (data pull, preprocessing, modeling). Each script has 2 versions. 1 with the suffix "airflow" which is used in the airflow deployment and 1 that is used when the pipeline is run locally using the main.py file.  
+* files_not_in_use contains all the files that could be of some value for other projects in the future. This project started by targeting the Ticketmaster and Eventbrite APIs. The scope changed and moved focus into the Spotify API for ease of use. The work already done in previous attempts could be useful for other projects and is only valuable as recordkeeping. It has nothing to do with this current project. 
+
+
+## Future Improvements
+* Work on the configuration for postgress in airflow to know where the postgres is. Add a health check and make sure Airflow's metadata is in postgress
+* Figure out the memory issue and remove the "limit 420000" from the code to use the entire dataset. 
+* Add a dashboarding solution to display the results 
