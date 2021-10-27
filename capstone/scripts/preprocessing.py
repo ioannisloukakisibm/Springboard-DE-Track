@@ -21,6 +21,11 @@ from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession
 
 
+"""
+Creating dummy variables out of categorical variables. 
+Since each data point can be in multiple cateogories, I am using the multilabelbinarizer package
+example: A song could have multiple genres. All these genres would need to be encoded as 1
+"""
 def dummy_variables(input_df, variable_for_dummies):
 
     input_df[variable_for_dummies] = input_df[variable_for_dummies].apply(lambda s: list(ast.literal_eval(s)))
@@ -41,6 +46,9 @@ def dummy_variables(input_df, variable_for_dummies):
     return merged, list_of_dummy_columns, list_of_non_dummy_columns
 
 
+"""
+Taking care of some missing values to not lose entire rows
+"""
 def missingness(input_df):
     
     input_df.fillna({'album label':'no info', 'artist number of followers':0}, inplace = True)
@@ -51,6 +59,14 @@ def missingness(input_df):
     return input_df
 
 
+
+"""
+The data pulls are weekly and the song characteristics change every week. We wil be aggregating these 
+rows into 1 row per song and taking the average. Hence, we do not want large swings in values (outliers)
+or dirty data to affect the averages. 
+We need to calculate STDs and remove the outliers based on percentiles
+The next few functions are dealing with outliers in this form
+"""
 def calculate_stds(input_df):
 
     std_vars = ['artist popularity', 'artist number of followers', 'album popularity', 'song popularity']
@@ -129,6 +145,12 @@ def cleanup_dirty_data(input_df, std_vars):
     return df1
 
 
+
+"""
+Some times there are differences in characteristics of songs that should not be changing
+These songs arere creating duplicate values when these characteristics are used in a groupby statement
+Remove this duplication
+"""
 def remove_duplication(input_df):
 
     df1 = input_df.copy()
@@ -150,6 +172,9 @@ def remove_duplication(input_df):
     return df1
 
 
+"""
+preparing the dataset for modeling. 1 row per song
+"""
 def pre_modelling(df, list_of_dummy_columns, list_of_non_dummy_columns):
 
     list_of_dummy_columns.append('song_id')
