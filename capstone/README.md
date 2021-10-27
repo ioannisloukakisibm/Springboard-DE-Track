@@ -30,7 +30,6 @@ If for some strange reason someone wants to clone this repo, all you have to do 
 
 ```
 python main.py
-
 ```
 
 ### TEST
