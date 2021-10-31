@@ -2,16 +2,23 @@ version: '3.7'
 services:
     postgres:
         image: postgres:9.6
+        restart: always
         environment:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
+        healthcheck:
+          test: [ "CMD", "pg_isready", "-q", "-d", "airflow_db", "-U", "airflow" ]
+          timeout: 45s
+          interval: 10s
+          retries: 10
         volumes:
             - ./postgress_data:/usr/local/postgress_data
         extra_hosts:
             - "host.docker.internal:host-gateway"
 
-    
+
+
     webserver:
         image: webserver:latest
         build:

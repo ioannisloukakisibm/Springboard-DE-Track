@@ -16,7 +16,8 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 default_args = {
-    'start_date':'2021-10-17'
+    'start_date':str(datetime.now().date())
+    # 'start_date':'2021-10-30'
     ,'schedule_interval':'0 10 * * 1'
     ,'retries': 2
     ,'retry_delay': timedelta(minutes=5)
