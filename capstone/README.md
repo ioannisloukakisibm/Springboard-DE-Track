@@ -5,6 +5,8 @@
 * [Description](#description)
 * [Technologies](#technologies)
 * [LocalExecution](#localexecution)
+* [Folder description](#Folder-description)
+* [Future Improvements](#Future-Improvements)
 
 ## General Info
 This is a school project organized for the author to experiment on docker technologies/Airflow/APIs and has no value to society whatsoever. 
@@ -36,6 +38,6 @@ python main.py
 
 
 ## Future Improvements
-* Work on the configuration for postgress in airflow to know where the postgres is. Add a health check and make sure Airflow's metadata is in postgress
+* Work on the configuration for postgress in airflow to know where the postgres is. Make sure Airflow's metadata is in postgress
 * Figure out the memory issue and remove the "limit 420000" from the code to use the entire dataset. 
 * Add a dashboarding solution to display the results 
